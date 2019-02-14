@@ -1,0 +1,95 @@
+class ParamaterVary(object):
+
+    forceList = []
+    forceListLength = None
+    ampDict = {}
+
+
+    stiffGunTopList = []
+    stiffGunTopListLength = None
+    stiffGunBotList = []
+    stiffGunBotListLength = None
+    stiffCombiList = []
+    stiffCombiListLength = None
+
+    combination = {}
+
+
+    def _init_(self):
+        pass
+
+    ################## LIST with Gun Top Stiffness ##########################
+    def createStiffListGunTop(self):
+        stiffStartVal = 7000
+        stiffCurrVal = stiffStartVal
+        for i in range(3):
+            self.stiffGunTopList.append(stiffCurrVal)
+            stiffCurrVal = stiffCurrVal + 1000
+        self.stiffGunTopListLength = len(self.stiffGunTopList)
+
+
+    ################## LIST with Gun Bottom Stiffness ######################
+    def createStiffListGunBot(self):
+        stiffStartVal = 8000
+        stiffCurrVal = stiffStartVal
+        for i in range(3):
+            self.stiffGunBotList.append(stiffCurrVal)
+            stiffCurrVal = stiffCurrVal + 1000
+        self.stiffGunBotListLength = len(self.stiffGunBotList)
+
+
+    ############## LIST with combination of Gun Stiffness ##################
+    def createStiffList(self):
+        self.createStiffListGunTop()
+        self.createStiffListGunBot()
+
+        for i in range(self.stiffGunTopListLength):
+            for j in range(self.stiffGunBotListLength):
+                topStiffVal = self.stiffGunTopList[i]
+                botStiffVal = self.stiffGunBotList[j]
+                self.stiffCombiList.append([topStiffVal, botStiffVal])
+        self.stiffCombiListLength = len(self.stiffCombiList)
+        #print(self.stiffCombiList)
+
+
+    ############## LIST of Gun Top Force Values ############################
+    def createForceList(self):
+        self.forceList = [1379, 1878, 2382]
+        self.forceListLength = len(self.forceList)
+
+
+    ############ Dict of Gun Top Force Amplitudes ###########################
+    def createForceAmp(self):
+        self.createForceList()
+
+        for i in range(self.forceListLength):
+            forceAmpTemp = [[0.0, -0.01],[0.005, -0.01]]
+            currValForce = self.forceList[i] * (-1)
+            forceAmpTemp.append([0.01, currValForce])
+            ampDictKeyVal = 'Amp' + str(i)
+            self.ampDict[ampDictKeyVal] = forceAmpTemp
+
+
+    ############ Combination of Stiff & Force #############################
+    def createCombination(self):
+
+        self.createStiffList()
+        self.createForceAmp()
+        combiKeyVal = 0
+
+        for i in range(self.forceListLength):
+
+            for j in range(self.stiffCombiListLength):
+
+                ampDictKeyVal = 'Amp' + str(i)
+                currForceAmplitude = self.ampDict[ampDictKeyVal]
+                currStiffVal = self.stiffCombiList[j]
+                self.combination[str(combiKeyVal)] = [currForceAmplitude, currStiffVal]
+                combiKeyVal = combiKeyVal + 1
+
+
+    def getCombination(self):
+        self.createCombination()
+        #print(self.combination)
+        #print(len(self.combination))
+        return self.combination
