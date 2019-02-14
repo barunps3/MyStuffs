@@ -1,1 +1,62 @@
-abx 
+
+################################################# SECTION for FORCE VARIATION #######################################
+
+forceVar = [1379, 1878, 2382] # different force variation values
+
+################################################  SECTION for STIFFNESS VARIATION ################################## 	
+
+i = 0
+stiffVarList = []
+stiffVal = 7000
+
+for i in range(3): # to increase the values of stiffness 3 times by 1000
+	stiffVarList.append(stiffVal)
+	stiffVal = stiffVal + 1000 
+	i = i + 1
+	
+####################################################################################################################	
+
+
+
+
+
+
+
+
+####################################################################################################################
+for force in forceVar:
+
+	p_all_SimRun_temp = copy.deepcopy(p_all_SimRun_baseline_SC)
+	
+	############################################################################
+	
+	# create a new force list
+	forceList_X = [[0.0, -0.01],[0.005, -0.01]]
+	forceList_X.append([0.01, force])
+	# ASSIGN the NEW FORCE AMPLITUDE  ##########################################
+	p_all_SimRun_temp['processPar']['ForceAmplitude_move_closing'] = forceList_X
+	
+	############################################################################
+	
+	
+	# ASSIGN the NEW STIFFNESS VARIABLE #####################################################
+	
+	for stiff in stiffVarList:
+		
+		p_all_SimRun_temp['weldMachine']['gun_top']['spring_stiffness'] = stiff
+	
+		###############################################################################################
+	
+		# ADD p_all_SimRun_List with ALL THE SIMULATION VARIATION #####################################
+		p_all_SimRun_temp['SimulationMetaData']['name_sim_campaign'] = name_Sim_Campaign + '_' + 'Force' + str(force) + '_' + 'Stiff '+ str(stiff)
+		# Modify the ID of the simulation run
+		Sim_ID = len(p_all_SimRun_list) + 1
+		p_all_SimRun_temp['SimulationMetaData']['simRun_ID'] =  Sim_ID
+		# creates a folder named 'RSW_2Dax_StSt_ShortCirc_Barun' + '_' + str(Sim_ID)
+		p_all_SimRun_temp['FEMethod']['JobName_root'] = 'RSW_2Dax_StSt_ShortCirc' + '_' + str(Sim_ID)
+		p_all_SimRun_list.append(p_all_SimRun_temp)
+		
+		###############################################################################################
+		
+
+#####################################################################################################################	
