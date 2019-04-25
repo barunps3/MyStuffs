@@ -65,53 +65,14 @@ SimFoldersTemp = SimDict['PathsSimFolders_rel']
 
 SimFolderList = [SimFoString.split('\\')[-1] for SimFoString in SimFoldersTemp]
 
-# EvalScriptName = "evaluate_results_odb.bat"     #evaluate_results_odb.bat starts getWeldDiameterFromODB.py for extraction of weld diameter
-# NameSimFolderTemplate = "SpotWelding2D_Sim_"    #SpotWelding2D_Sim_ is enumerated to SpotWelding2D_Sim_1, SpotWelding2D_Sim_2, etc. is the folder where simulations are executed in
-NameSimFolder = ""                              #Enumerated folder
-AmplitudesFolder = ""                              
-
-TotalNumberSims = 0 
-NumSim = 0                           #as python starts enumeration with 0 a total of TotalNumberSims + 1 simulations will be performed
-SimulationList = [] 
-
-UnlockFile = "unlock.py"                        #existence of this file will be checked and execution of next simulation prevented if file does not exist
-OptimizationContMark = "OptCont.py"
-OptimizationFinishMark = "OptFin.py"
-
-
-
-
-
 
 MainFolder = os.getcwd()                        #MainFolder set to the directory in which this script was started
 
 
-#SimStatusDict = {}
-
-#for Order, SimFolder in enumerate(SimFolderList):
-#    
-#    SimStatusDict[SimFolder] = {}
-#    
-#
-#    SimStatusDict[SimFolder]['Status'] = 'created'
-#    SimStatusDict[SimFolder]['Order'] = Order
-
-
-
-
-#SimFolderList = list(SimStatusDict.keys())
-#SimStatusList = [SimStatusDict[SimFolder]['Status'] for SimFolder in SimFolderList]
-#SimOrderList = [SimStatusDict[SimFolder]['Order'] for SimFolder in SimFolderList]
 
 
 #loop through simulations 
 for SimNumber, SimFolder in enumerate(SimFolderList):
-    
-#    NameSimFolder = NameSimFolderTemplate + str(NumSim) #current simulation folder, enumerates the simulation folder to SpotWelding2D_Sim_1, SpotWelding2D_Sim_2 etc.
-#    NameSimFolderDBG = NameSimFolderTemplate + str(NumSim+1) #next simulation folder, used for debugging purposes
-#    shutil.copytree(NameSimFolderTemplate, NameSimFolder)
-    
-#    os.chdir(AmplitudesFolder)     #changes working directory to NameSimFolder. Required because otherwise subprocess.Popen() would start "StartCouplingMethod.bat" in the MainFolder
     
     #checks existence of unlock.py and starts simulation if it is found in the current simulation folder, otherwise waits 10 seconds until recheck
     if SimNumber == 0:
@@ -123,13 +84,7 @@ for SimNumber, SimFolder in enumerate(SimFolderList):
         print("waiting for unlock of: " + SimFolder)
     
 
-    print (CoupledSimProcess)
-    
-#    shutil.move("Amplitudes/Stromverlauf.txt", SimFolder+"/main")
-#    shutil.move("Amplitudes/Kraftverlauf.txt", SimFolder+"/main")
-#    os.remove("Amplitudes/unlock.py")
-    
-    # shutil.copy(CoupledSimProcess, SimFolder)    
+    print(CoupledSimProcess)
 
     try: 
         os.remove("Amplitudes/EvalFinished.py")
@@ -149,38 +104,9 @@ for SimNumber, SimFolder in enumerate(SimFolderList):
     while os.path.isfile(SimFolder+"/SimFinishMark.py") == False:      
         time.sleep(10) #Suspends script for 10 seconds
         print("waiting for simulation to finish: " + SimFolder)
-    
-    
-#    shutil.move(NameSimFolder+"/SimFinishMark.py", "Amplitudes")          
-    
-#    os.chdir(SimFolder)    
-#    subprocess.Popen([EvalScriptName],creationflags=CREATE_NEW_CONSOLE)     #Starts the evaluation by executing evaluate_results_odb.bat in the NameSimFolder 
-#    
-#    os.chdir(MainFolder)    #changes current working directory to MainFolder
-#    os.chdir(NameSimFolderDBG) #changes current working directory to next simulation folder
-    
-    
-#    while os.path.isfile(SimFolder+"/EvalFinished.py") == False:
-#        print ("waiting for evaluation of: " +SimFolder)
-#        time.sleep(10)
-#    shutil.move(SimFolder+"/EvalFinished.py", "Amplitudes")
 
-#    with open(SimFolder+"/weldDiameter.dat", "r") as weldDiamFile:
-#        weldDiam = float(weldDiamFile.readline())
-
-#    with open("Amplitudes/weldDiamList.dat", "a") as DiamListFile:
-#        DiamListFile.write(str(weldDiam)+"\n") 
     outputFileObject = open(SimFolderList[SimNumber+1]+"/unlock.py", "w") #writes unlock file for next simulation allowing it to proceed
     outputFileObject.close()
     
     
     print (MainFolder)
-    
-#    if os.path.isfile("Amplitudes/OptCont.py") == True:   
-#        NumSim += 1
-#        TotalNumberSims +=1
-#    else:
-#        while os.path.isfile("OptFin.py") == False:
-#            print("Simulation Finished")
-#            time.sleep(10)
-    
