@@ -55,28 +55,22 @@ with open(jsonFilePath) as json_data:
   SimDict = json.load(json_data)
 # END with
 
-
-
-
 # Assign the internal variables required in this script:
 CoupledSimProcess = SimDict['Name_batFile_execute_SimRun']   # name defined in the baseline folder to run the simulations
 SimFoldersTemp = SimDict['PathsSimFolders_rel']
-SimFoldersTemp = SimDict['PathsSimFolders_rel']
-
 SimFolderList = [SimFoString.split('\\')[-1] for SimFoString in SimFoldersTemp]
 
-
-MainFolder = os.getcwd()                        #MainFolder set to the directory in which this script was started
-
-
-
+#MainFolder set to the directory in which this script was started
+MainFolder = os.getcwd()                        
 
 #loop through simulations 
-for SimNumber, SimFolder in enumerate(SimFolderList):
-    
+#for SimChar in enumerate(SimFolderList):
+def ParallelSim(SimChar):
+    SimNumber = SimChar[0]
+    SimFolder = SimChar[1]
     #checks existence of unlock.py and starts simulation if it is found in the current simulation folder, otherwise waits 10 seconds until recheck
     if SimNumber == 0:
-        
+        # write the unlock file for first simulation to start simcampaign
         outputFileObject = open(SimFolderList[SimNumber]+"/unlock.py", "w")
         
     while os.path.isfile(SimFolder+"/unlock.py") == False:
@@ -84,29 +78,30 @@ for SimNumber, SimFolder in enumerate(SimFolderList):
         print("waiting for unlock of: " + SimFolder)
     
 
-    print(CoupledSimProcess)
-
-    try: 
-        os.remove("Amplitudes/EvalFinished.py")
-    except:
-        pass
-    
+    #print(CoupledSimProcess)    
     os.chdir(SimFolder)
-    
-    subprocess.Popen([CoupledSimProcess],creationflags=CREATE_NEW_CONSOLE)  #Starts the simulation by executing StartCouplingMethod.bat in the NameSimFolder 
-    
+    #Starts the simulation by executing StartCouplingMethod.bat in the NameSimFolder
+    subprocess.Popen(CoupledSimProcess, creationflags=CREATE_NEW_CONSOLE) #  
+    #subprocess.Popen("cmd")    
     os.chdir(MainFolder) 
     
-
-
-    
     #checks existence of SimFinishMark.py and starts evaluation if it is found in the current simulation folder, otherwise waits 10 seconds until recheck
+    """
     while os.path.isfile(SimFolder+"/SimFinishMark.py") == False:      
         time.sleep(10) #Suspends script for 10 seconds
         print("waiting for simulation to finish: " + SimFolder)
+    """
+    #writes unlock file for next simulation allowing it to proceed
+    outputFileObject = open(SimFolderList[SimNumber+1]+"/unlock.py", "w") 
+    outputFileObject.close()    
+    #print (MainFolder)
 
-    outputFileObject = open(SimFolderList[SimNumber+1]+"/unlock.py", "w") #writes unlock file for next simulation allowing it to proceed
-    outputFileObject.close()
-    
-    
-    print (MainFolder)
+
+
+import multiprocessing as mp
+if __name__ == '__main__':
+    pool = mp.Pool(int(mp.cpu_count()/2))
+    simNumFolderTupleList = [val for val in enumerate(SimFolderList)]
+    pool.map_async(ParallelSim, simNumFolderTupleList)
+    pool.close()
+    pool.join()
